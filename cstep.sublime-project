@@ -1,0 +1,26 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+		}
+	],
+	"settings":
+	{
+		"LSP":
+		{
+			"LSP-lua":
+			{
+				"settings":
+				{
+					"Lua.runtime.version": "LuaJIT",
+					"Lua.workspace.checkThirdParty": false,
+					"Lua.workspace.library":
+					[
+						"${3rd}/love2d/library"
+					]
+				}
+			}
+		}
+	},
+}
