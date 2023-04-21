@@ -1,5 +1,5 @@
 function love.load( ... )
-	-- body shush
+	-- body
 end
 
 function love.update( ... )
