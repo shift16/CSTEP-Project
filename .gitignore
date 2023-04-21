@@ -41,3 +41,5 @@ luac.out
 
 # Sublime workspace file
 *.sublime-workspace
+
+# Test
