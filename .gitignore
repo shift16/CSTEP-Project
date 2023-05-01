@@ -41,4 +41,4 @@ luac.out
 
 # Sublime workspace file
 *.sublime-workspace
-
+*.sublime-project
