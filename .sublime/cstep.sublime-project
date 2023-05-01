@@ -22,6 +22,30 @@
 				},
 			},
 		},
-
 	},
+
+	"build_systems": [
+		{
+			"name": "Execute with love",
+			"working_dir": "$folder",
+			"target": "terminus_exec",
+			"cancel": "terminus_cancel_build",
+			"selector": "source.lua",
+			"file_regex": "^(?:lua:)?[\t ](...*?):([0-9]*):?([0-9]*)",
+			
+			"shell_cmd": "./love.app src",
+
+		},
+
+		{
+			"name": "Package project",
+			"working_dir": "$folder",
+			"target": "terminus_exec",
+			"cancel": "terminus_cancel_build",
+			"selector": "source.lua",
+			"file_regex": "^(?:lua:)?[\t ](...*?):([0-9]*):?([0-9]*)",
+
+			"shell_cmd": "echo Unimplemented"
+		}
+	]
 }
