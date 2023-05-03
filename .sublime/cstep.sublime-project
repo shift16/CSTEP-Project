@@ -19,6 +19,10 @@
 					[
 						"${3rd}/love2d/library"
 					],
+					"Lua.diagnostics.disable":
+					[
+						"trailing-space"
+					],
 				},
 			},
 		},
@@ -45,7 +49,7 @@
 			"selector": "source.lua",
 			"file_regex": "^(?:lua:)?[\t ](...*?):([0-9]*):?([0-9]*)",
 
-			"shell_cmd": "echo Unimplemented"
+			"shell_cmd": "echo Unimplemented",
 		}
-	]
+	],
 }
