@@ -1,95 +1,57 @@
 -- Import modules
-local Edge = require "edge"
+local enforce_type = require "enforce_type"
 
--- Override built-in type function
-require "typeplus"
-
-
--- Node for a graph
+-- Define the class constructor
 local Node = {}
 
--- Private helper function
--- Returns if two nodes are linked and the edge that links them
-local function is_linked(edge_array, node)
-	-- Type checking
-	assert(type(edge_array) == "table", "The data-type '" .. type(edge_array) .. "' is not of type table")
-	assert(type(node) == "Node", "The data-type '" .. type(node) .. "' is not of type Node")
-
-	for _, edge in ipairs(edge_array) do
-		-- Type checking (Pending removal)
-		assert(type(edge) == "Edge", "The data-type '" .. type(edge) .. "' is not of type Edge")
-		
-		if edge:contains(node) then
-			return true, edge
+-- Define the meta-table
+local NodeMT = {
+	-- Defines the type of object
+	__index = function (self, index)
+		-- The __type property is always protected and therefore not modifiable
+		if (index == "__type") then
+			return "Node"
+		else
+			error("The property " .. index .. " does not exist in type " .. self.__type)
 		end
-	end
+	end,
 
-	return false, nil
-end
+	-- Prevents the modification of undefined and protected properties
+	__newindex = function (self, index, _)
+		if (self[index] ~= nil) then
+			error("The property " .. index .. " is not modifiable in type " .. self.__type)
+		else
+			error("The property " .. index .. " does not exist in type " .. self.__type)
+		end
+	end,
 
--- Creates a new node
-function Node.new(id)
+	-- Locks the meta-table
+	__metatable = not nil
+}
+
+function Node.new(node_id)
 	-- Type checking
-	assert(type(id) == "string", "The data-type '" .. type(id) .. "' is not of type string")
+	enforce_type("string", node_id)
 
-	-- Define private properties
-	local edges = {}
-
-	return {
-		-- Set data-type
-		__type = "Node",
-
+	return setmetatable({
 		-- Define public properties
-		id = id or nil,
+		edges = {},
+		id = node_id,
+
 		-- Define public methods
-		-- Connects the two nodes and returns the created edge
-		connect = function (self, node)
+		is_linked = function (self, node)
 			-- Type checking
-			assert(type(node) == "Node", "The data-type '" .. type(node) .. "' is not of type Node")
+			enforce_type("Node", self, node)
 
-			-- Runtime error checking
-			-- Make sure this node is not already linked
-			if is_linked(edges, node) then
-				error("Node " .. tostring(self) .. " is already linked to " .. tostring(node))
-			end
-
-			-- Creates an edge with no weight set to it
-			local new_edge = Edge.new(self, node, nil)
-
-			table.insert(edges, new_edge)
-
-			return new_edge
-		end,
-
-		-- Disconnects the two nodes and returns the deleted edge
-		disconnect = function (self, node)
-			-- Type checking
-			assert(type(node) == "Node", "The data-type '" .. type(node) .. "' is not of type Node")
-
-			local connection_status, connecting_edge = is_linked(edges, node)
-			
-			-- Runtime error checking
-			-- Make sure that these two nodes are actually connected
-			if (connection_status == false) then
-				error("The following node " .. tostring(self) .. " is already linked to " .. tostring(node))
-			end
-
-			-- The result from is_linked won't be nil if connection_status is true
-			---@diagnostic disable-next-line: need-check-nil
-			connecting_edge:snap()
-
-			-- Remove the edge
-			for index, edge in ipairs(edges) do
-				if edge == connecting_edge then
-					table.remove(edge, index)
-					break
+			for _, edge in ipairs(self.edges) do
+				if (edge:contains(node)) then
+					return true
 				end
 			end
 
-			return connecting_edge
+			return false
 		end
-
-	}
+	}, NodeMT)
 end
 
 return Node

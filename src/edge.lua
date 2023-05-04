@@ -1,48 +1,56 @@
--- Override built-in type function
-require "typeplus"
+-- Import modules
+local enforce_type = require "enforce_type"
 
--- Edge for a graph
-
+-- Define the class constructor
 local Edge = {}
 
--- Creates a new edge
-function Edge.new(node1, node2, weight)
+-- Define the meta-table
+local EdgeMT = {
+	-- Defines the type of object
+	__index = function (self, index)
+		-- The __type property is always protected and therefore not modifiable
+		if (index == "__type") then
+			return "Edge"
+		else
+			error("The property " .. index .. " does not exist in type " .. self.__type)
+		end
+	end,
+
+	-- Prevents the modification of undefined and protected properties
+	__newindex = function (self, index, _)
+		if (self[index] ~= nil) then
+			error("The property " .. index .. " is not modifiable in type " .. self.__type)
+		else
+			error("The property " .. index .. " does not exist in type " .. self.__type)
+		end
+	end,
+
+	-- Locks the meta-table
+	__metatable = not nil
+}
+
+function Edge.new(node1, node2, edge_id, weight)
 	-- Type checking
-	assert(type(node1) == "Node", "The data-type '" .. type(node1) .. "' is not of type Node")
-	assert(type(node2) == "Node", "The data-type '" .. type(node2) .. "' is not of type Node")
-	assert(type(weight) == "number" or type(weight) == "nil", "The data-type '" .. type(weight) .. "' is not of type number")
+	enforce_type("Node", node1, node2)
+	enforce_type("number", weight)
+	enforce_type("string", edge_id)
 
-
-	return {
-		-- Set data-type
-		__type = "Edge",
-
+	return setmetatable({
 		-- Define public properties
-		nodes = {node1, node2},
-		-- Weight has a default value of -1; indicating that it wasn't defined
-		weight = weight or -1,
+		weight = weight,
+		id = edge_id,
+		starting_node = node1,
+		ending_node = node2,
 
 		-- Define public methods
-		-- Checks if this edge contains a node
+		-- Checks if a node is a part of the edge
 		contains = function (_, node)
 			-- Type checking
-			assert(type(node) == "Node", "The data-type '" .. type(node) .. "' is not of type Node")
+			enforce_type("Node", node)
 
-			return node == node1 or node == node2
-		end,
-
-		-- Completely breaks the bonds between the two nodes
-		snap = function (self)
-			-- Remove references
-			self.nodes = {}
-			node1 = nil
-			node2 = nil
+			return node1 == node or node2 == node
 		end
-
-
-	}
+	}, EdgeMT)
 end
-
-
 
 return Edge

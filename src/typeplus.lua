@@ -1,12 +1,9 @@
--- Overrides the built-in type function
--- Save reference to old type function
-local old_type = type
-
--- Override the type function
-type = function (obj)
-	local obj_type = old_type(obj)
+-- Returns a custom type function
+return function (obj)
+	local obj_type = type(obj)
 
 	if (obj_type == "table") then
+		-- Classes will have the property __type set to a custom value
 		return obj.__type or "table"
 	else
 		return obj_type

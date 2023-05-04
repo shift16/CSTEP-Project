@@ -1,8 +1,10 @@
 -- Import modules
-local Graph = require "graph"
+local enforce_type = require "enforce_type"
+local type = require "typeplus"
 
--- Override built-in type function
-require "typeplus"
+-- Classes
+local Graph = require "graph"
+local Node = require "node"
 
 -- Loads the maze
 function love.load( ... )
@@ -12,10 +14,15 @@ function love.load( ... )
 	local node2 = graph1:create_node("B")
 	local node3 = graph1:create_node("C")
 
-	local edge_between_node1_and_2 = node1:connect(node2)
-	node1:disconnect(node2)
+	local edge1, edge2 = graph1:create_bi_directional_link("A", "B", 1)
+	local edge3 = graph1:create_one_directional_link("A", "C", 1)
 
-	print(edge_between_node1_and_2:contains(node1), edge_between_node1_and_2:contains(node2), edge_between_node1_and_2:contains(node3))
+	print(edge1, edge2, edge3)
+	local connected_to_1 = graph1:get_linked_nodes(node1)
+
+	for index, node in ipairs(connected_to_1) do
+		print(index, node.id)
+	end
 end
 
 function love.update( ... )
