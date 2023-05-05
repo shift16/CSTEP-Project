@@ -1,10 +1,10 @@
 -- Import modules
-local type = require "typeplus"
 local enforce_type = require "enforce_type"
 
 -- Classes
 local Edge = require "edge"
 local Node = require "node"
+local Dijkstra = require "dijkstra"
 
 -- Define the class constructor
 local Graph = {}
@@ -133,6 +133,28 @@ function Graph.new()
 			end
 
 			return connected_nodes
+		end,
+
+		-- Returns an object that performs Dijkstra's algorithm per step
+		create_dijkstra = function (self, node1_id, node2_id)
+			-- Type checking
+			enforce_type("Graph", self)
+			enforce_type("string", node1_id, node2_id)
+
+			-- Runtime error checking
+			-- Make sure the nodes exist
+			if nodes[node1_id] == nil then
+				error("The following node " .. node1_id .. " does not exist in the graph")
+			end
+
+			if nodes[node2_id] == nil then
+				error("The following node " .. node2_id .. " does not exist in the graph")
+			end
+
+			local starting_node = nodes[node1_id]
+			local ending_node = nodes[node2_id]
+
+			return Dijkstra.new(self, starting_node, ending_node)
 		end
 	}, GraphMT)
 end

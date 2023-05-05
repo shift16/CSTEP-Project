@@ -21,7 +21,8 @@
 					],
 					"Lua.diagnostics.disable":
 					[
-						"trailing-space"
+						"trailing-space",
+						"empty-block",
 					],
 				},
 			},
