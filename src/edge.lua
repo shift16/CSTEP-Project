@@ -49,6 +49,19 @@ function Edge.new(node1, node2, edge_id, weight)
 			enforce_type("Node", node)
 
 			return node1 == node or node2 == node
+		end,
+
+		-- Destroys the link between two nodes
+		destroy = function (self)
+			-- Type checking
+			enforce_type("Edge", self)
+			
+			node1 = nil
+			node2 = nil
+			weight = nil
+			self.id = nil
+
+			return edge_id
 		end
 	}, EdgeMT)
 end

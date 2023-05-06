@@ -77,6 +77,12 @@ function Graph.new()
 			end
 
 			local edge_id = node1_id .. node2_id
+
+			-- Make sure the edge doesn't already exist
+			if edges[edge_id] ~= nil then
+				error("The following connection going from node " .. node1_id .. " to " .. node2_id .. " already exists")	
+			end
+
 			local node1 = nodes[node1_id]
 			local node2 = nodes[node2_id]
 
@@ -126,6 +132,12 @@ function Graph.new()
 			-- Type checking
 			enforce_type("string", node_id)
 
+			-- Runtime error checking
+			-- Make sure the node actually exists
+			if nodes[node_id] == nil then
+				error("The following node " .. node_id .. " does not exist")	
+			end
+
 			local connected_nodes = {}
 
 			for _, edge in ipairs(nodes[node_id].edges) do
@@ -135,7 +147,7 @@ function Graph.new()
 			return connected_nodes
 		end,
 
-		-- Returns an object that performs Dijkstra's algorithm per step
+		-- Returns an object that performs Dijkstra's algorithm per call to the step function
 		create_dijkstra = function (self, node1_id, node2_id)
 			-- Type checking
 			enforce_type("Graph", self)
@@ -155,6 +167,51 @@ function Graph.new()
 			local ending_node = nodes[node2_id]
 
 			return Dijkstra.new(self, starting_node, ending_node)
+		end,
+
+		-- Destroys the edge connecting node 1 to node 2
+		destroy_link_with = function (_, node1_id, node2_id)
+			-- Type checking
+			enforce_type("string", node1_id, node2_id)
+
+			local node = nodes[node1_id]
+			local linked_node = nodes[node2_id]
+
+			-- Runtime error checking
+			-- Make sure these nodes actually exist
+			if nodes[node1_id] == nil then
+				error("The following node " .. node1_id .. " does not exist in the graph")
+			end
+
+			if nodes[node2_id] == nil then
+				error("The following node " .. node2_id .. " does not exist in the graph")
+			end
+
+			-- Make sure the other node is actually linked to it
+			if not node:is_linked(linked_node) then
+				error("The following node " .. linked_node.id .. " is not linked to " .. node.id)
+			end
+
+			for index, edge in ipairs(node.edges) do
+				if edge:contains(linked_node) then
+					-- Destroy the edge
+					local edge_id = edge:destroy()
+					-- Remove it from the dictionary
+					edges[edge_id] = nil
+					-- Remove it from the nodes array
+					table.remove(node.edges, index)
+					break
+				end
+			end
+		end,
+
+		purge_link = function (self, node1_id, node2_id)
+			-- Type checking
+			enforce_type("Graph", self)
+			enforce_type("string", node1_id, node2_id)
+
+			self:destroy_link_with(node1_id, node2_id)
+			self:destroy_link_with(node2_id, node1_id)
 		end
 	}, GraphMT)
 end
